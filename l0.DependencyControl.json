@@ -1,0 +1,358 @@
+{
+  "config": {
+    "updaterRunning": {
+      "host": "l0.DependencyControl.Toolbox",
+      "time": 1754684725
+    }
+  },
+  "macros": {
+    "ILL.Shapery": {
+      "configFile": "ILL.Shapery.json",
+      "feed": "https:\/\/raw.githubusercontent.com\/TypesettingTools\/ILL-Aegisub-Scripts\/main\/DependencyControl.json",
+      "version": 132609,
+      "author": "ILLTeam",
+      "name": "Shapery",
+      "requiredModules": [
+        {
+          "url": "https:\/\/github.com\/TypesettingTools\/ILL-Aegisub-Scripts\/",
+          "feed": "https:\/\/raw.githubusercontent.com\/TypesettingTools\/ILL-Aegisub-Scripts\/main\/DependencyControl.json",
+          "version": "1.3.2",
+          "moduleName": "clipper2.clipper2"
+        },
+        {
+          "url": "https:\/\/github.com\/TypesettingTools\/ILL-Aegisub-Scripts\/",
+          "feed": "https:\/\/raw.githubusercontent.com\/TypesettingTools\/ILL-Aegisub-Scripts\/main\/DependencyControl.json",
+          "version": "1.6.5",
+          "moduleName": "ILL.ILL"
+        }
+      ],
+      "namespace": "ILL.Shapery"
+    },
+    "l0.DependencyControl.Toolbox": {
+      "configFile": "l0.DependencyControl.Toolbox.json",
+      "feed": "https:\/\/raw.githubusercontent.com\/TypesettingTools\/DependencyControl\/master\/DependencyControl.json",
+      "version": 259,
+      "namespace": "l0.DependencyControl.Toolbox",
+      "requiredModules": {},
+      "lastUpdateCheck": 1754684238,
+      "name": "DependencyControl Toolbox",
+      "author": "line0"
+    }
+  },
+  "modules": {
+    "phos.AegiGui": {
+      "feed": "https:\/\/raw.githubusercontent.com\/PhosCity\/Aegisub-Scripts\/main\/DependencyControl.json",
+      "version": 65536,
+      "requiredModules": [
+        {
+          "url": "https:\/\/github.com\/TypesettingTools\/Functional",
+          "feed": "https:\/\/raw.githubusercontent.com\/TypesettingTools\/Functional\/master\/DependencyControl.json",
+          "version": "0.6.0",
+          "moduleName": "l0.Functional"
+        }
+      ],
+      "namespace": "phos.AegiGui",
+      "configFile": "phos.AegiGui.json",
+      "moduleName": "phos.AegiGui",
+      "url": "https:\/\/github.com\/PhosCity\/Aegisub-Scripts",
+      "name": "AegiGui",
+      "author": "PhosCity"
+    },
+    "a-mo.Tags": {
+      "feed": "https:\/\/raw.githubusercontent.com\/TypesettingTools\/Aegisub-Motion\/DepCtrl\/DependencyControl.json",
+      "version": 66308,
+      "lastUpdateCheck": 1754684709,
+      "requiredModules": [
+        {
+          "version": "1.0.0",
+          "moduleName": "a-mo.Log"
+        },
+        {
+          "version": "1.2.3",
+          "moduleName": "a-mo.Transform"
+        }
+      ],
+      "namespace": "a-mo.Tags",
+      "configFile": "a-mo.Tags.json",
+      "moduleName": "a-mo.Tags",
+      "url": "https:\/\/github.com\/TypesettingTools\/Aegisub-Motion",
+      "name": "Tags",
+      "author": "torque"
+    },
+    "a-mo.Line": {
+      "feed": "https:\/\/raw.githubusercontent.com\/TypesettingTools\/Aegisub-Motion\/DepCtrl\/DependencyControl.json",
+      "version": 66819,
+      "lastUpdateCheck": 1754684709,
+      "requiredModules": [
+        {
+          "moduleName": "aegisub.util"
+        },
+        {
+          "moduleName": "json"
+        },
+        {
+          "version": "1.0.0",
+          "moduleName": "a-mo.Log"
+        },
+        {
+          "version": "1.3.4",
+          "moduleName": "a-mo.Tags"
+        },
+        {
+          "version": "1.2.4",
+          "moduleName": "a-mo.Transform"
+        }
+      ],
+      "namespace": "a-mo.Line",
+      "configFile": "a-mo.Line.json",
+      "moduleName": "a-mo.Line",
+      "url": "https:\/\/github.com\/TypesettingTools\/Aegisub-Motion",
+      "name": "Line",
+      "author": "torque"
+    },
+    "myaa.ASSParser": {
+      "feed": "https:\/\/raw.githubusercontent.com\/TypesettingTools\/Myaamori-Aegisub-Scripts\/master\/DependencyControl.json",
+      "version": 4,
+      "requiredModules": [
+        {
+          "moduleName": "aegisub.re"
+        },
+        {
+          "moduleName": "aegisub.util"
+        },
+        {
+          "url": "https:\/\/github.com\/TypesettingTools\/Functional",
+          "feed": "https:\/\/raw.githubusercontent.com\/TypesettingTools\/Functional\/master\/DependencyControl.json",
+          "version": "0.6.0",
+          "moduleName": "l0.Functional"
+        }
+      ],
+      "namespace": "myaa.ASSParser",
+      "configFile": "myaa.ASSParser.json",
+      "moduleName": "myaa.ASSParser",
+      "url": "http:\/\/github.com\/TypesettingTools\/Myaamori-Aegisub-Scripts",
+      "name": "ASSParser",
+      "author": "Myaamori"
+    },
+    "a-mo.Transform": {
+      "feed": "https:\/\/raw.githubusercontent.com\/TypesettingTools\/Aegisub-Motion\/DepCtrl\/DependencyControl.json",
+      "version": 66052,
+      "lastUpdateCheck": 1754684709,
+      "requiredModules": [
+        {
+          "version": "1.0.0",
+          "moduleName": "a-mo.Log"
+        },
+        {
+          "version": "1.0.0",
+          "moduleName": "a-mo.Math"
+        },
+        {
+          "version": "1.3.4",
+          "moduleName": "a-mo.Tags"
+        }
+      ],
+      "namespace": "a-mo.Transform",
+      "configFile": "a-mo.Transform.json",
+      "moduleName": "a-mo.Transform",
+      "url": "https:\/\/github.com\/TypesettingTools\/Aegisub-Motion",
+      "name": "Transform",
+      "author": "torque"
+    },
+    "PT.PreciseTimer": {
+      "feed": "https:\/\/raw.githubusercontent.com\/TypesettingTools\/ffi-experiments\/master\/DependencyControl.json",
+      "version": 262,
+      "lastUpdateCheck": 1754684238,
+      "requiredModules": {},
+      "namespace": "PT.PreciseTimer",
+      "configFile": "PT.PreciseTimer.json",
+      "moduleName": "PT.PreciseTimer",
+      "url": "https:\/\/github.com\/TypesettingTools\/ffi-experiments",
+      "name": "PreciseTimer",
+      "author": "torque"
+    },
+    "a-mo.Log": {
+      "configFile": "a-mo.Log.json",
+      "unmanaged": true,
+      "version": 65536,
+      "moduleName": "a-mo.Log",
+      "requiredModules": {},
+      "name": "a-mo.Log",
+      "namespace": "a-mo.Log"
+    },
+    "DM.DownloadManager": {
+      "feed": "https:\/\/raw.githubusercontent.com\/TypesettingTools\/ffi-experiments\/master\/DependencyControl.json",
+      "version": 1280,
+      "lastUpdateCheck": 1754684237,
+      "requiredModules": {},
+      "namespace": "DM.DownloadManager",
+      "configFile": "DM.DownloadManager.json",
+      "moduleName": "DM.DownloadManager",
+      "url": "https:\/\/github.com\/TypesettingTools\/ffi-experiments",
+      "name": "DownloadManager",
+      "author": "torque"
+    },
+    "a-mo.Math": {
+      "configFile": "a-mo.Math.json",
+      "unmanaged": true,
+      "version": 65536,
+      "moduleName": "a-mo.Math",
+      "requiredModules": {},
+      "name": "a-mo.Math",
+      "namespace": "a-mo.Math"
+    },
+    "requireffi.requireffi": {
+      "feed": "https:\/\/raw.githubusercontent.com\/TypesettingTools\/ffi-experiments\/master\/DependencyControl.json",
+      "version": 258,
+      "lastUpdateCheck": 1754684238,
+      "requiredModules": {},
+      "namespace": "requireffi.requireffi",
+      "configFile": "requireffi.requireffi.json",
+      "moduleName": "requireffi.requireffi",
+      "url": "https:\/\/github.com\/TypesettingTools\/ffi-experiments",
+      "name": "requireffi",
+      "author": "torque"
+    },
+    "a-mo.LineCollection": {
+      "feed": "https:\/\/raw.githubusercontent.com\/TypesettingTools\/Aegisub-Motion\/DepCtrl\/DependencyControl.json",
+      "version": 66304,
+      "lastUpdateCheck": 1754684725,
+      "requiredModules": [
+        {
+          "version": "1.0.0",
+          "moduleName": "a-mo.Log"
+        },
+        {
+          "version": "1.5.3",
+          "moduleName": "a-mo.Line"
+        }
+      ],
+      "namespace": "a-mo.LineCollection",
+      "configFile": "a-mo.LineCollection.json",
+      "moduleName": "a-mo.LineCollection",
+      "url": "https:\/\/github.com\/TypesettingTools\/Aegisub-Motion",
+      "name": "LineCollection",
+      "author": "torque"
+    },
+    "arch.Math": {
+      "configFile": "arch.Math.json",
+      "namespace": "arch.Math",
+      "version": 266,
+      "moduleName": "arch.Math",
+      "url": "https:\/\/github.com\/TypesettingTools\/arch1t3cht-Aegisub-Scripts",
+      "requiredModules": {},
+      "name": "ArchMath",
+      "author": "arch1t3cht"
+    },
+    "BM.BadMutex": {
+      "feed": "https:\/\/raw.githubusercontent.com\/TypesettingTools\/ffi-experiments\/master\/DependencyControl.json",
+      "version": 259,
+      "lastUpdateCheck": 1754684238,
+      "requiredModules": {},
+      "namespace": "BM.BadMutex",
+      "configFile": "BM.BadMutex.json",
+      "moduleName": "BM.BadMutex",
+      "url": "https:\/\/github.com\/TypesettingTools\/ffi-experiments",
+      "name": "BadMutex",
+      "author": "torque"
+    },
+    "ILL.ILL": {
+      "feed": "https:\/\/raw.githubusercontent.com\/TypesettingTools\/ILL-Aegisub-Scripts\/main\/DependencyControl.json",
+      "version": 67328,
+      "requiredModules": [
+        {
+          "2": "json",
+          "moduleName": "ffi"
+        },
+        {
+          "url": "https:\/\/github.com\/TypesettingTools\/ILL-Aegisub-Scripts\/",
+          "feed": "https:\/\/raw.githubusercontent.com\/TypesettingTools\/ILL-Aegisub-Scripts\/main\/DependencyControl.json",
+          "version": "1.4.0",
+          "moduleName": "clipper2.clipper2"
+        }
+      ],
+      "namespace": "ILL.ILL",
+      "configFile": "ILL.ILL.json",
+      "moduleName": "ILL.ILL",
+      "url": "https:\/\/github.com\/TypesettingTools\/ILL-Aegisub-Scripts\/",
+      "name": "ILL",
+      "author": "ILLTeam"
+    },
+    "l0.DependencyControl": {
+      "feed": "https:\/\/raw.githubusercontent.com\/TypesettingTools\/DependencyControl\/master\/DependencyControl.json",
+      "version": 1539,
+      "lastUpdateCheck": 1754684237,
+      "requiredModules": [
+        {
+          "feed": "https:\/\/raw.githubusercontent.com\/torque\/ffi-experiments\/master\/DependencyControl.json",
+          "version": "0.3.1",
+          "moduleName": "DM.DownloadManager"
+        },
+        {
+          "feed": "https:\/\/raw.githubusercontent.com\/torque\/ffi-experiments\/master\/DependencyControl.json",
+          "version": "0.1.3",
+          "moduleName": "BM.BadMutex"
+        },
+        {
+          "feed": "https:\/\/raw.githubusercontent.com\/torque\/ffi-experiments\/master\/DependencyControl.json",
+          "version": "0.1.5",
+          "moduleName": "PT.PreciseTimer"
+        },
+        {
+          "feed": "https:\/\/raw.githubusercontent.com\/torque\/ffi-experiments\/master\/DependencyControl.json",
+          "version": "0.1.1",
+          "moduleName": "requireffi.requireffi"
+        }
+      ],
+      "namespace": "l0.DependencyControl",
+      "configFile": "l0.DependencyControl.json",
+      "moduleName": "l0.DependencyControl",
+      "url": "http:\/\/github.com\/TypesettingTools\/DependencyControl",
+      "name": "DependencyControl",
+      "author": "line0"
+    },
+    "l0.Functional": {
+      "feed": "https:\/\/raw.githubusercontent.com\/TypesettingTools\/Functional\/master\/DependencyControl.json",
+      "version": 1536,
+      "lastUpdateCheck": 1754684387,
+      "requiredModules": [
+        {
+          "moduleName": "aegisub.util"
+        },
+        {
+          "moduleName": "aegisub.unicode"
+        },
+        {
+          "moduleName": "aegisub.re"
+        }
+      ],
+      "namespace": "l0.Functional",
+      "configFile": "l0.Functional.json",
+      "moduleName": "l0.Functional",
+      "url": "https:\/\/github.com\/TypesettingTools\/Functional",
+      "name": "(Almost) Functional Suite",
+      "author": "line0"
+    },
+    "clipper2.clipper2": {
+      "feed": "https:\/\/raw.githubusercontent.com\/TypesettingTools\/ILL-Aegisub-Scripts\/main\/DependencyControl.json",
+      "version": 66560,
+      "requiredModules": [
+        {
+          "moduleName": "ffi"
+        },
+        {
+          "url": "https:\/\/github.com\/TypesettingTools\/ffi-experiments",
+          "feed": "https:\/\/raw.githubusercontent.com\/TypesettingTools\/ffi-experiments\/master\/DependencyControl.json",
+          "version": "0.1.2",
+          "moduleName": "requireffi.requireffi"
+        }
+      ],
+      "namespace": "clipper2.clipper2",
+      "configFile": "clipper2.clipper2.json",
+      "moduleName": "clipper2.clipper2",
+      "url": "https:\/\/github.com\/TypesettingTools\/ILL-Aegisub-Scripts",
+      "name": "clipper2",
+      "author": "ILLTeam"
+    }
+  }
+}
