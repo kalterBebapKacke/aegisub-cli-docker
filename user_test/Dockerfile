@@ -35,7 +35,6 @@ WORKDIR /home
 
 COPY ../input.ass .
 
-
 # deps: FFMS2
 RUN apt-get install -y ffmsindex
 # deps: readline
@@ -145,7 +144,8 @@ COPY ./src/l0.DependencyControl.json ${HOME}/.aegisub/config/
 #RUN curl -L https://raw.githubusercontent.com/RellikJaeger/DependencyControl/refs/tags/v0.6.4-alpha/DependencyControl.json -o l0.DependencyControl.json
 
 # Fix issue with yutils not getting installed
-RUN curl -L https://raw.githubusercontent.com/TypesettingTools/Yutils/refs/heads/master/src/Yutils.lua -o /usr/local/share/lua/5.1/Yutils.lua
+#RUN curl -L https://raw.githubusercontent.com/TypesettingTools/Yutils/refs/heads/master/src/Yutils.lua -o /usr/local/share/lua/5.1/Yutils.lua
+
 
 # Install missings Fonts
 RUN apt-get update && apt-get install -y \
@@ -160,10 +160,7 @@ RUN mkdir -p ${HOME}/.aegisub/log
 
 WORKDIR /home
 
-RUN Xvfb :99 -screen 0 1024x768x16 &
-RUN export DISPLAY=:99
-
-RUN aegisub-cli --automation l0.DependencyControl.Toolbox.moon --dialog '{"button":0,"values":{"macro":"DependencyControl"}}' --loglevel 4 input.ass dummy_out.ass "DependencyControl/Install Script"
-RUN aegisub-cli --automation l0.DependencyControl.Toolbox.moon --dialog '{"button": 0, "values": {"macro":"Shapery v2.6.1"}}' --loglevel 4 input.ass dummy_out.ass "DependencyControl/Install Script"
-
+RUN xvfb-run -a -s "-screen 0 1024x768x16" aegisub-cli --automation l0.DependencyControl.Toolbox.moon --dialog '{"button":0,"values":{"macro":"DependencyControl"}}' --loglevel 4 input.ass dummy_out.ass "DependencyControl/Install Script"
+RUN xvfb-run -a -s "-screen 0 1024x768x16" aegisub-cli --automation l0.DependencyControl.Toolbox.moon --dialog '{"button": 0, "values": {"macro":"Shapery v2.6.1"}}' --loglevel 4 input.ass dummy_out.ass "DependencyControl/Install Script"
 #aegisub-cli --automation ILL.Shapery.moon --loglevel 4 input.ass dummy_out.ass ": Shapery macros :/Shape expand"
+# gdb --args aegisub-cli --automation l0.DependencyControl.Toolbox.moon --dialog '{"button":0,"values":{"macro":"DependencyControl"}}' --loglevel 4 input.ass dummy_out.ass "DependencyControl/Install Script" || true
