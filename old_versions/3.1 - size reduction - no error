@@ -11,13 +11,37 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libass-dev libasound2-dev libffms2-dev intltool \
     libhunspell-dev libuchardet-dev libpulse-dev \
     libopenal-dev libxxhash-dev nasm lua5.1 liblua5.1-0-dev luarocks \
-    libcurl4-gnutls-dev \
+    libcurl4-gnutls-dev libreadline8 libreadline-dev \
+    libgtk2.0-dev libgtk-3-dev freeglut3-dev libjpeg-dev \
+    liblzma-dev \
     libboost-all-dev \
     libboost-filesystem1.74.0 libboost-locale1.74.0 libboost-regex1.74.0 libboost-thread-dev \
     libffms2-5 libboost-program-options1.74.0 libboost-filesystem1.74.0 libboost-system1.74.0 libboost-chrono1.74.0 \
-    fonts-liberation fonts-dejavu fontconfig \
+    fonts-liberation fonts-dejavu fontconfig xvfb \
     && python3 -m pip install --upgrade pip meson \
     && rm -rf /var/lib/apt/lists/*
+
+###
+# Copy test input
+#WORKDIR /home
+
+#COPY ../input.ass .
+
+# deps: FFMS2
+#RUN apt-get install -y ffmsindex
+# deps: readline
+#RUN apt-get install libreadline8 libreadline-dev
+# deps: wxWidgets - https://gist.github.com/pemd-sys/6aed397bcbdb380cb53bc09183f3a8f4
+#RUN apt-get install -y libgtk2.0-dev
+#RUN apt-get install -y libgtk-3-dev
+#RUN apt-get install -y mesa-utils
+#RUN apt-get install -y freeglut3-dev
+#RUN apt-get install -y libjpeg-dev
+#RUN apt-get install -y liblzma-dev
+
+#RUN apt-get update && apt-get install -y \
+#    libwxgtk3.0-gtk3-0v5 libwxbase3.0-0v5 libwxgtk3.0-gtk3-0v5 \
+#    && rm -rf /var/lib/apt/lists/*
 
 ####
 
@@ -79,21 +103,11 @@ RUN apt-get purge -y --auto-remove \
     libass-dev libasound2-dev libffms2-dev intltool \
     libboost-all-dev libhunspell-dev libuchardet-dev libpulse-dev \
     libopenal-dev libxxhash-dev nasm liblua5.1-0-dev \
-    libcurl4-gnutls-dev libreadline-dev \
+    libcurl4-gnutls-dev libreadline-dev libgtk2.0-dev \
+    freeglut3-dev libjpeg-dev liblzma-dev \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /build/*
 
-RUN apt-get update && apt-get install -y libwxgtk3.0-gtk3-dev libgtk2.0-dev
-
-# ---- Install additional fonts ----
-COPY ./src/webfonts.tar.gz ./webfonts.tar.gz
-RUN apt install -y cabextract \
-    && tar -xzf webfonts.tar.gz \
-    && cd msfonts/ \
-    && cabextract *.exe \
-    && mkdir -p ~/.local/share/fonts/ \
-    && cp *.ttf *.TTF ~/.local/share/fonts/ \
-    && cd ..
-
+RUN apt-get update && apt-get install -y libwxgtk3.0-gtk3-dev
 
 # ---- Automation scripts ----
 WORKDIR ${HOME}/.aegisub/automation
@@ -108,4 +122,4 @@ COPY ../input.ass .
 # Test run
 RUN aegisub-cli --automation l0.DependencyControl.Toolbox.moon --dialog '{"button":0,"values":{"macro":"DependencyControl"}}' --loglevel 4 input.ass dummy_out.ass "DependencyControl/Install Script" || true
 RUN aegisub-cli --automation l0.DependencyControl.Toolbox.moon --dialog '{"button": 0, "values": {"macro":"Shapery v2.6.1"}}' --loglevel 4 input.ass dummy_out.ass "DependencyControl/Install Script" || true
-RUN aegisub-cli --automation ILL.Shapery.moon --loglevel 4 input.ass dummy_out.ass ": Shapery macros :/Shape expand" || true
+#RUN aegisub-cli --automation ILL.Shapery.moon --loglevel 4 input.ass dummy_out.ass ": Shapery macros :/Shape expand" || true

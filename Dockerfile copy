@@ -84,17 +84,6 @@ RUN apt-get purge -y --auto-remove \
 
 RUN apt-get update && apt-get install -y libwxgtk3.0-gtk3-dev libgtk2.0-dev
 
-# ---- Install additional fonts ----
-COPY ./src/webfonts.tar.gz ./webfonts.tar.gz
-RUN apt install -y cabextract \
-    && tar -xzf webfonts.tar.gz \
-    && cd msfonts/ \
-    && cabextract *.exe \
-    && mkdir -p ~/.local/share/fonts/ \
-    && cp *.ttf *.TTF ~/.local/share/fonts/ \
-    && cd ..
-
-
 # ---- Automation scripts ----
 WORKDIR ${HOME}/.aegisub/automation
 COPY ../scripts ./scripts/
