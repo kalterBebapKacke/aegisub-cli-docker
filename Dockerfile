@@ -1,4 +1,5 @@
-FROM ubuntu:22.04
+#FROM ubuntu:22.04 AS builder
+FROM nickblah/lua:5.1.5-luarocks-ubuntu AS builder
 
 ENV DEBIAN_FRONTEND=noninteractive
 WORKDIR /build
@@ -10,7 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libx11-dev libwxgtk3.0-gtk3-dev libfreetype6-dev libfontconfig1-dev \
     libass-dev libasound2-dev libffms2-dev intltool \
     libhunspell-dev libuchardet-dev libpulse-dev \
-    libopenal-dev libxxhash-dev nasm lua5.1 liblua5.1-0-dev luarocks \
+    libopenal-dev libxxhash-dev nasm  \
     libcurl4-gnutls-dev \
     libboost-all-dev \
     libboost-filesystem1.74.0 libboost-locale1.74.0 libboost-regex1.74.0 libboost-thread-dev \
@@ -19,15 +20,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && python3 -m pip install --upgrade pip meson \
     && rm -rf /var/lib/apt/lists/*
 
+#   lua5.1 liblua5.1-0-dev luarocks \
 ####
 
 # libboost-filesystem1.74.0 libboost-locale1.74.0 libboost-regex1.74.0 libboost-thread-dev \
 # libffms2-5 libboost-program-options1.74.0 libboost-filesystem1.74.0 libboost-system1.74.0 libboost-chrono1.74.0 \
 
 # ---- Lua dependencies ----
-RUN luarocks --lua-version=5.1 install luajson 1.3.3-1 \
- && luarocks --lua-version=5.1 install moonscript \
- && luarocks --lua-version=5.1 install luafilesystem
+#RUN luarocks --lua-version=5.1 install luajson 1.3.3-1 \
+# && luarocks --lua-version=5.1 install moonscript \
+# && luarocks --lua-version=5.1 install luafilesystem
 
 # ---- Build Aegisub ----
 WORKDIR /build
@@ -54,6 +56,53 @@ RUN git clone https://github.com/Myaamori/aegisub-cli \
     && mv build/src/libresrc/libresrc.a /usr/local/lib/ \
     && mv build/src/libresrc/default_config.h /usr/local/include/
 
+# Runtime stage
+FROM ubuntu:22.04 AS runtime
+
+# ---- COPY Files ----
+COPY --from=builder /usr/bin/aegisub /usr/bin/
+COPY --from=builder /usr/local/bin/aegisub-cli /usr/local/bin/
+#COPY --from=builder /usr/local/lib/* /usr/local/lib/
+COPY --from=builder /usr/share/aegisub/* /usr/share/aegisub/
+#COPY --from=builder /usr/local/bin/moon /usr/local/bin/
+#COPY --from=builder /usr/local/bin/moonc /usr/local/bin/
+#COPY --from=builder /usr/local/share/lua/5.1/* /usr/local/share/lua/5.1/
+#COPY --from=builder /usr/bin/lua5.1 /usr/bin
+#COPY --from=builder /usr/bin/luac5.1 /usr/bin
+#COPY --from=builder /usr/local/lib/luarocks /usr/local/lib/luarocks
+#COPY --from=builder /usr/local/share/lua /usr/local/share/lua
+#COPY --from=builder /usr/local/lib/lua /usr/local/lib/lua
+#COPY --from=builder /usr/lib/x86_64-linux-gnu/liblua5.1.so* /usr/lib/x86_64-linux-gnu/
+
+
+RUN apt-get update  \
+    && apt-get install -y \
+    python3 \
+    libwxgtk3.0-gtk3-0v5 libwxbase3.0-0v5 \
+    libx11-6 libfreetype6 libfontconfig1 libass9 libasound2 \
+    libboost-filesystem1.74.0 libboost-locale1.74.0 libboost-regex1.74.0 \
+    libhunspell-1.7-0 libuchardet0 libpulse0 libopenal1 \
+    libcurl3-gnutls \
+    libffms2-5 libboost-program-options1.74.0 libboost-filesystem1.74.0 libboost-system1.74.0 libboost-chrono1.74.0 \
+    fonts-liberation fonts-dejavu fontconfig \
+    curl git \
+    lua5.1 liblua5.1-0 liblua5.1-0-dev luarocks \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+RUN luarocks --lua-version=5.1 install luajson 1.3.3-1 \
+ && luarocks --lua-version=5.1 install moonscript \
+ && luarocks --lua-version=5.1 install luafilesystem
+
+RUN ldconfig
+
+# ---- Install additional fonts ----
+COPY ./src/webfonts.tar.gz ./webfonts.tar.gz
+RUN apt-get update && apt install -y cabextract \
+    && tar -xzf webfonts.tar.gz \
+    && cd msfonts/ \
+    && cabextract *.exe \
+    && mkdir -p ~/.local/share/fonts/ \
+    && cp *.ttf *.TTF ~/.local/share/fonts/
 
 # ---- Setup Aegisub automation ----
 ARG HOME='/root'
@@ -65,47 +114,31 @@ RUN mkdir -p ${HOME}/.aegisub/config/ \
 # ---- Build Dependency Control ----
 WORKDIR /build
 COPY ../src/Logger.moon ./Logger.moon
-RUN curl -L https://github.com/RellikJaeger/DependencyControl/releases/download/v0.6.4-alpha/DependencyControl-v0.6.4-Linux-amd64.tar.gz \
-    | tar -xz \
+RUN curl -L https://github.com/RellikJaeger/DependencyControl/releases/download/v0.6.4-alpha/DependencyControl-v0.6.4-Linux-amd64.tar.gz -o DependencyControl-v0.6.4-Linux-amd64.tar.gz \
+    && tar -xvf ./DependencyControl-v0.6.4-Linux-amd64.tar.gz \
     && rm -f DependencyControl-v0.6.4-Linux-amd64/include/l0/DependencyControl/Logger.moon \
     && cp Logger.moon DependencyControl-v0.6.4-Linux-amd64/include/l0/DependencyControl/ \
     && mv ./DependencyControl-v0.6.4-Linux-amd64/include/* ${HOME}/.aegisub/automation/include/ \
     && mv ./DependencyControl-v0.6.4-Linux-amd64/autoload/* ${HOME}/.aegisub/automation/autoload/
 
-# ---- Cleanup build deps to shrink image ----
-RUN apt-get purge -y --auto-remove \
-    cmake pkg-config ninja-build build-essential \
-    libx11-dev libfreetype6-dev libfontconfig1-dev \
-    libass-dev libasound2-dev libffms2-dev intltool \
-    libboost-all-dev libhunspell-dev libuchardet-dev libpulse-dev \
-    libopenal-dev libxxhash-dev nasm liblua5.1-0-dev \
-    libcurl4-gnutls-dev libreadline-dev \
-    && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /build/*
-
-RUN apt-get update && apt-get install -y libwxgtk3.0-gtk3-dev libgtk2.0-dev
-
-# ---- Install additional fonts ----
-COPY ./src/webfonts.tar.gz ./webfonts.tar.gz
-RUN apt install -y cabextract \
-    && tar -xzf webfonts.tar.gz \
-    && cd msfonts/ \
-    && cabextract *.exe \
-    && mkdir -p ~/.local/share/fonts/ \
-    && cp *.ttf *.TTF ~/.local/share/fonts/ \
-    && cd ..
-
-
 # ---- Automation scripts ----
 WORKDIR ${HOME}/.aegisub/automation
 COPY ../scripts ./scripts/
-#COPY ./src/l0.DependencyControl.json ./l0.DependencyControl.json
+# Delete /build
 
+RUN ldd /usr/bin/aegisub
+RUN ldd /usr/local/bin/aegisub-cli
 
 WORKDIR /home
 COPY ../input.ass .
 
+#ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/liblua5.1.so.0
+
+RUN echo $LUA_PATH
+RUN echo $LUA_CPATH
+
 
 # Test run
-RUN aegisub-cli --automation l0.DependencyControl.Toolbox.moon --dialog '{"button":0,"values":{"macro":"DependencyControl"}}' --loglevel 4 input.ass dummy_out.ass "DependencyControl/Install Script" || true
-RUN aegisub-cli --automation l0.DependencyControl.Toolbox.moon --dialog '{"button": 0, "values": {"macro":"Shapery v2.6.1"}}' --loglevel 4 input.ass dummy_out.ass "DependencyControl/Install Script" || true
-RUN aegisub-cli --automation ILL.Shapery.moon --loglevel 4 input.ass dummy_out.ass ": Shapery macros :/Shape expand" || true
+#RUN aegisub-cli --automation l0.DependencyControl.Toolbox.moon --dialog '{"button":0,"values":{"macro":"DependencyControl"}}' --loglevel 4 input.ass dummy_out.ass "DependencyControl/Install Script"
+#RUN aegisub-cli --automation l0.DependencyControl.Toolbox.moon --dialog '{"button": 0, "values": {"macro":"Shapery v2.6.1"}}' --loglevel 4 input.ass dummy_out.ass "DependencyControl/Install Script" || true
+#RUN aegisub-cli --automation ILL.Shapery.moon --loglevel 4 input.ass dummy_out.ass ": Shapery macros :/Shape expand" #|| true
