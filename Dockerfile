@@ -14,11 +14,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libcurl4-gnutls-dev \
     libboost-all-dev libreadline-dev \
     fonts-liberation fonts-dejavu fontconfig \
+    cabextract \
     && python3 -m pip install --upgrade pip meson \
     && rm -rf /var/lib/apt/lists/*
 
 #   lua5.1 liblua5.1-0-dev luarocks \
-####
+#    libwxgtk3.0-gtk3-0v5 libwxbase3.0-0v5 \
+ #    libx11-6 libfreetype6 libfontconfig1 libass9 libasound2 \
+ #    libhunspell-1.7-0 libuchardet0 libpulse0 libopenal1 \
+ #    libcurl3-gnutls \
 
 # libboost-filesystem1.74.0 libboost-locale1.74.0 libboost-regex1.74.0 libboost-thread-dev \
 # libffms2-5 libboost-program-options1.74.0 libboost-filesystem1.74.0 libboost-system1.74.0 libboost-chrono1.74.0 \
@@ -37,13 +41,27 @@ RUN git clone https://github.com/Myaamori/aegisub-cli \
     && mv build/src/libresrc/libresrc.a /usr/local/lib/ \
     && mv build/src/libresrc/default_config.h /usr/local/include/
 
+WORKDIR /home
+# ---- Install additional fonts ----
+COPY ./src/webfonts.tar.gz ./webfonts.tar.gz
+RUN tar -xzf webfonts.tar.gz \
+    && cd msfonts/ \
+    && cabextract *.exe \
+    && mkdir -p ~/.local/share/fonts/ \
+    && cp *.ttf *.TTF ~/.local/share/fonts/
+
+
+
 # Runtime stage
 FROM ubuntu:22.04 AS runtime
 
 # ---- COPY Files ----
 COPY --from=builder /usr/local/bin/aegisub-cli /usr/local/bin/
+COPY --from=builder /root/.local/share/fonts/* /root/.local/share/fonts/
+COPY --from=builder /home/*.deb /home/
 
 
+# ---- Install packages ----
 RUN apt-get update  \
     && apt-get install -y \
     python3 \
@@ -52,30 +70,23 @@ RUN apt-get update  \
     libhunspell-1.7-0 libuchardet0 libpulse0 libopenal1 \
     libcurl3-gnutls \
     fonts-liberation fonts-dejavu fontconfig \
-    curl\
+    curl software-properties-common \
     libboost-program-options1.74.0 \
-    software-properties-common cabextract  \
     libfreetype6-dev libfontconfig1-dev \
-    && add-apt-repository ppa:alex-p/aegisub \
-    && apt install -y aegisub \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-#libffms2-5 libboost-program-options1.74.0 libboost-filesystem1.74.0 libboost-system1.74.0 libboost-chrono1.74.0 libboost-filesystem1.74.0 libboost-locale1.74.0 libboost-regex1.74.0 \
-#lua5.1 liblua5.1-0  luarocks \
-
-RUN ldconfig
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+    && ldconfig
 
 WORKDIR /home
-# ---- Install additional fonts ----
-COPY ./src/webfonts.tar.gz ./webfonts.tar.gz
-RUN tar -xzf webfonts.tar.gz \
-    && cd msfonts/ \
-    && cabextract *.exe \
-    && mkdir -p ~/.local/share/fonts/ \
-    && cp *.ttf *.TTF ~/.local/share/fonts/ \
-    && cd .. \
-    && ls -a . #\
-    && rm -rf ./msfonts
+# ---- Install aegisub ----
+RUN apt-get update  \
+    && add-apt-repository ppa:alex-p/aegisub \
+    && apt install -y aegisub \
+    && apt remove -y software-properties-common
+
+#    && add-apt-repository ppa:alex-p/aegisub \
+#    && apt install -y aegisub \
+#    software-properties-common cabextract  \
+
 
 # ---- Setup Aegisub automation ----
 ARG HOME='/root'
@@ -98,11 +109,9 @@ RUN rm -rf /home/build
 
 # ---- Automation scripts ----
 WORKDIR ${HOME}/.aegisub/automation
-COPY ../scripts ./scripts/
-WORKDIR /home
+#COPY ../scripts ./scripts/
+#WORKDIR /home
 COPY ../input.ass .
-
-#ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/liblua5.1.so.0
 
 
 # Test run
