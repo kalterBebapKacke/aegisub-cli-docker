@@ -58,34 +58,22 @@ FROM ubuntu:22.04 AS runtime
 # ---- COPY Files ----
 COPY --from=builder /usr/local/bin/aegisub-cli /usr/local/bin/
 COPY --from=builder /root/.local/share/fonts/* /root/.local/share/fonts/
-COPY --from=builder /home/*.deb /home/
 
 
 # ---- Install packages ----
 RUN apt-get update  \
-    && apt-get install -y \
-    python3 \
+    && apt-get install -y --no-install-recommends \
     libwxgtk3.0-gtk3-0v5 libwxbase3.0-0v5 \
-    libx11-6 libfreetype6 libfontconfig1 libass9 libasound2 \
-    libhunspell-1.7-0 libuchardet0 libpulse0 libopenal1 \
-    libcurl3-gnutls \
-    fonts-liberation fonts-dejavu fontconfig \
-    curl software-properties-common \
+    libuchardet0 libx11-6 fontconfig libass9 \
+    curl ca-certificates \
     libboost-program-options1.74.0 \
     libfreetype6-dev libfontconfig1-dev \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
     && ldconfig
 
-WORKDIR /home
-# ---- Install aegisub ----
-RUN apt-get update  \
-    && add-apt-repository ppa:alex-p/aegisub \
-    && apt install -y aegisub \
-    && apt remove -y software-properties-common
-
-#    && add-apt-repository ppa:alex-p/aegisub \
-#    && apt install -y aegisub \
-#    software-properties-common cabextract  \
+#      libasound2 libpulse0 libhunspell-1.7-0 libopenal1 \
+#    python3 \
+#    libcurl3-gnutls \
 
 
 # ---- Setup Aegisub automation ----
@@ -104,15 +92,26 @@ RUN curl -L https://github.com/RellikJaeger/DependencyControl/releases/download/
     && rm -f DependencyControl-v0.6.4-Linux-amd64/include/l0/DependencyControl/Logger.moon \
     && cp Logger.moon DependencyControl-v0.6.4-Linux-amd64/include/l0/DependencyControl/ \
     && mv ./DependencyControl-v0.6.4-Linux-amd64/include/* ${HOME}/.aegisub/automation/include/ \
-    && mv ./DependencyControl-v0.6.4-Linux-amd64/autoload/* ${HOME}/.aegisub/automation/autoload/
-RUN rm -rf /home/build
+    && mv ./DependencyControl-v0.6.4-Linux-amd64/autoload/* ${HOME}/.aegisub/automation/autoload/ \
+    && rm -rf DependencyControl-v0.6.4-Linux-amd64
 
+WORKDIR /home
 # ---- Automation scripts ----
 WORKDIR ${HOME}/.aegisub/automation
 #COPY ../scripts ./scripts/
-#WORKDIR /home
+WORKDIR /home
 COPY ../input.ass .
 
+WORKDIR /home
+# ---- Install aegisub ----
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends software-properties-common gpg-agent \
+  && add-apt-repository ppa:alex-p/aegisub \
+  && apt-get update \
+  && apt-get install -y --no-install-recommends aegisub \
+  && apt-get purge -y software-properties-common gpg-agent \
+  && apt-get autoremove -y \
+  && rm -rf /var/lib/apt/lists/*
 
 # Test run
 RUN aegisub-cli --automation l0.DependencyControl.Toolbox.moon --dialog '{"button":0,"values":{"macro":"DependencyControl"}}' --loglevel 4 input.ass dummy_out.ass "DependencyControl/Install Script" || true
