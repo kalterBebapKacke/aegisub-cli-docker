@@ -18,15 +18,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && python3 -m pip install --upgrade pip meson \
     && rm -rf /var/lib/apt/lists/*
 
-#   lua5.1 liblua5.1-0-dev luarocks \
-#    libwxgtk3.0-gtk3-0v5 libwxbase3.0-0v5 \
- #    libx11-6 libfreetype6 libfontconfig1 libass9 libasound2 \
- #    libhunspell-1.7-0 libuchardet0 libpulse0 libopenal1 \
- #    libcurl3-gnutls \
-
-# libboost-filesystem1.74.0 libboost-locale1.74.0 libboost-regex1.74.0 libboost-thread-dev \
-# libffms2-5 libboost-program-options1.74.0 libboost-filesystem1.74.0 libboost-system1.74.0 libboost-chrono1.74.0 \
-
 # ---- Build aegisub-cli ----
 RUN python3 -m pip install meson==0.62 # Downgrade Meson due to sandbox violation (known issue)
 WORKDIR /build
@@ -54,6 +45,7 @@ RUN tar -xzf webfonts.tar.gz \
 
 # Runtime stage
 FROM ubuntu:22.04 AS runtime
+ENV DEBIAN_FRONTEND=noninteractive
 
 # ---- COPY Files ----
 COPY --from=builder /usr/local/bin/aegisub-cli /usr/local/bin/
@@ -70,10 +62,6 @@ RUN apt-get update  \
     libfreetype6-dev libfontconfig1-dev \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
     && ldconfig
-
-#      libasound2 libpulse0 libhunspell-1.7-0 libopenal1 \
-#    python3 \
-#    libcurl3-gnutls \
 
 
 # ---- Setup Aegisub automation ----
@@ -95,10 +83,11 @@ RUN curl -L https://github.com/RellikJaeger/DependencyControl/releases/download/
     && mv ./DependencyControl-v0.6.4-Linux-amd64/autoload/* ${HOME}/.aegisub/automation/autoload/ \
     && rm -rf DependencyControl-v0.6.4-Linux-amd64
 
-WORKDIR /home
 # ---- Automation scripts ----
 WORKDIR ${HOME}/.aegisub/automation
 #COPY ../scripts ./scripts/
+
+# ---- Copy Input Script ----
 WORKDIR /home
 COPY ../input.ass .
 
@@ -116,4 +105,4 @@ RUN apt-get update \
 # Test run
 RUN aegisub-cli --automation l0.DependencyControl.Toolbox.moon --dialog '{"button":0,"values":{"macro":"DependencyControl"}}' --loglevel 4 input.ass dummy_out.ass "DependencyControl/Install Script" || true
 RUN aegisub-cli --automation l0.DependencyControl.Toolbox.moon --dialog '{"button": 0, "values": {"macro":"Shapery v2.6.1"}}' --loglevel 4 input.ass dummy_out.ass "DependencyControl/Install Script" || true
-RUN aegisub-cli --automation ILL.Shapery.moon --loglevel 4 input.ass dummy_out.ass ": Shapery macros :/Shape expand" || true
+#RUN aegisub-cli --automation ILL.Shapery.moon --loglevel 4 input.ass dummy_out.ass ": Shapery macros :/Shape expand" || true
