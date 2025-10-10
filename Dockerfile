@@ -90,6 +90,7 @@ WORKDIR ${HOME}/.aegisub/automation
 # ---- Copy Input Script ----
 WORKDIR /home
 COPY ../input.ass .
+RUN rm -rf /home/build
 
 WORKDIR /home
 # ---- Install aegisub ----
