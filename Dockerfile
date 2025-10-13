@@ -85,7 +85,7 @@ RUN curl -L https://github.com/RellikJaeger/DependencyControl/releases/download/
 
 # ---- Automation scripts ----
 WORKDIR ${HOME}/.aegisub/automation
-#COPY ../scripts ./scripts/
+COPY ./src/jz.RoundedBorders.lua ${HOME}/.aegisub/automation/autoload/
 
 # ---- Copy Input Script ----
 WORKDIR /home
