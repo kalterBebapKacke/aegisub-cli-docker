@@ -27,39 +27,90 @@ function CreateRoundedBorders(bboxOffset, roundingRadius, transformY, borderColo
 
         for line, s, i, n in ass:iterSel() do
             ass:progressLine(s, i, n)
-            Line.extend(ass, line) -- Populate line table
+            Line.extend(ass, line)
 
-            -- Create top subtitle layer (text)
+            -- duplicate text as top layer
             local topLayer = Table.copy(line)
             topLayer.layer = topLayer.layer + 1
             ass:setLine(topLayer, s)
 
-            -- Create bottom subtitle layer (rounded border)
+            -- keep a safe reference to the ORIGINAL subtitle line
+            local originalLine = line
+
+            -- build rounded box bottom layer
             Line.callBackExpand(ass, line, nil, function(line)
-                local bottomLayer = Table.copy(line)
+                local bottom = Table.copy(line)
 
-                -- Create bounding box
-                local boundingBox = Path(bottomLayer.shape):boundingBox()["assDraw"]
-                local extendedBoundingBox = Path(boundingBox):offset(bboxOffset, "miter", "polygon", miterLimit, arcTolerance)
+                ------------------------------------------------------------------
+                -- 1. SHAPERY: Bounding box of ASS-drawn text
+                ------------------------------------------------------------------
+                local bbox = Path(bottom.shape):boundingBox()["assDraw"]
 
-                -- Round bounding box and move it downward
-                local roundedPath = Path.RoundingPath(
-                    extendedBoundingBox:export(), roundingRadius, false, "Rounded", "Absolute"
-                ):move(0, transformY)
+                ------------------------------------------------------------------
+                -- 2. SHAPERY: Expand = offset outward (stroke weight)
+                --    GUI: Offsetting → Outside stroke, Miter
+                ------------------------------------------------------------------
+                local expanded =
+                Path(bbox):offset(
+                    bboxOffset,        -- stroke weight
+                    "miter",           -- corner
+                    "polygon",         -- stroke alignment / method
+                    miterLimit,
+                    arcTolerance
+                )
 
-                -- Set shape and border color
-                bottomLayer.shape = roundedPath:export()
+                ------------------------------------------------------------------
+                -- 3. SHAPERY: Rounded corners (Absolute)
+                ------------------------------------------------------------------
+                local rounded =
+                Path.RoundingPath(
+                    expanded:export(),
+                                roundingRadius,
+                                false,             -- false = ABSOLUTE radius
+                                "Rounded",
+                                "Absolute"
+                )
 
-                bottomLayer.tags:insert({ { "c", borderColor } })
-                bottomLayer.tags:insert({ { "1a", borderAlpha } })
+                ------------------------------------------------------------------
+                -- 4. SHAPERY: Transform (X=0, Y=transformY, scale 100%, angle 0)
+                ------------------------------------------------------------------
+                rounded = rounded:move(0, transformY)
 
-                return ass:insertLine(bottomLayer, s)
+                ------------------------------------------------------------------
+                -- 5. RETAIN TEXT POSITION ON SCREEN
+                ------------------------------------------------------------------
+                local pos = line.tags.pos or { x = 0, y = 0 }
+                rounded = rounded:move(pos.x, pos.y)
+
+                ------------------------------------------------------------------
+                -- 6. PRESERVE INLINE ALPHA TAGS
+                --    Extract \alpha tags from original text and apply to background
+                ------------------------------------------------------------------
+                -- Keep the original text with its alpha tags for the background
+                -- This ensures that parts marked as invisible remain invisible
+                bottom.text_stripped = line.text_stripped
+
+
+                -- Set the shape and styling
+                bottom.shape = rounded:export()
+                bottom.tags:insert({ { "c",  borderColor } })
+
+                local tagString = bottom.tags.tags
+                if string.match(tagString, "\\alpha") or string.match(tagString, "\\[1-4]a") then
+                    bottom.tags:insert({ { "1a", "&HFF" } })
+                else
+                    bottom.tags:insert({ { "1a", borderAlpha } })
+                end
+
+                return ass:insertLine(bottom, s)
             end)
         end
 
         return ass:getNewSelection()
     end
 end
+
+
 
 function Gui(sub, sel, activeLine)
     local dialogConfig =
