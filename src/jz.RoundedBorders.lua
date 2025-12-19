@@ -16,10 +16,9 @@ else
     ILL = require("ILL.ILL")
 end
 
-
 local Ass, Line, Path, Table = ILL.Ass, ILL.Line, ILL.Path, ILL.Table
 
-function CreateRoundedBorders(bboxOffset, roundingRadius, transformY, borderColor, borderAlpha)
+function CreateRoundedBorders(bboxOffset, roundingRadius, transformY, borderColor, borderAlpha, scaling_factor)
     local miterLimit, arcTolerance = 2, 0.25
 
     return function(sub, sel, activeLine)
@@ -44,7 +43,29 @@ function CreateRoundedBorders(bboxOffset, roundingRadius, transformY, borderColo
                 ------------------------------------------------------------------
                 -- 1. SHAPERY: Bounding box of ASS-drawn text
                 ------------------------------------------------------------------
-                local bbox = Path(bottom.shape):boundingBox()["assDraw"]
+                --local bbox = Path(bottom.shape):boundingBox()["assDraw"]
+
+                -- get max size of the Box Yutils.shape.text(line, styles[line.style])
+                -- local textShape = aegisub.text_to_shape("Hg", ass.styles[line.style], false, false)
+                local w, h, asc, desc = aegisub.text_extents(ass.styles[line.style], "HgyÁ")
+                local centerY = (desc - asc) / 2 - 2*asc
+                local newHeight = scaling_factor*(asc + desc)
+
+                -- normalize vertical bounds
+                local bboxData = Path(bottom.shape):boundingBox()
+
+                -- Calculate new coordinates
+                local newTop = centerY - (newHeight / 2)
+                local newBottom = centerY + (newHeight / 2)
+
+                -- Create a rectangle shape directly with the dimensions needed
+                local newShape = string.format("m %d %d l %d %d %d %d %d %d",
+                    bboxData.l, newTop,    -- top-left
+                    bboxData.r, newTop,    -- top-right
+                    bboxData.r, newBottom, -- bottom-right
+                    bboxData.l, newBottom  -- bottom-left
+                )
+                local bbox = Path(newShape):boundingBox()["assDraw"]
 
                 ------------------------------------------------------------------
                 -- 2. SHAPERY: Expand = offset outward (stroke weight)
@@ -121,17 +142,20 @@ function Gui(sub, sel, activeLine)
         { x = 1, y = 1, width = 1, height = 1, class = "intedit", name = "radius" },
         { x = 0, y = 2, width = 1, height = 1, class = "label",   label = "Transform Y: " },
         { x = 1, y = 2, width = 1, height = 1, class = "intedit", name = "transformY" },
-        { x = 0, y = 3, width = 1, height = 1, class = "label",   label = "Border Color: " },
-        { x = 1, y = 3, width = 1, height = 1, class = "textbox", name = "borderColor",    text = "&H000000&" },
-        { x = 0, y = 4, width = 1, height = 1, class = "label",   label = "Border Alpha: " },
-        { x = 1, y = 4, width = 1, height = 1, class = "textbox", name = "borderAlpha",    text = "&H00&" }
+        { x = 0, y = 3, width = 1, height = 1, class = "label",   label = "Height Scaling: " },
+        { x = 1, y = 3, width = 1, height = 1, class = "floatedit", name = "heightscaling" },
+        { x = 0, y = 4, width = 1, height = 1, class = "label",   label = "Border Color: " },
+        { x = 1, y = 4, width = 1, height = 1, class = "textbox", name = "borderColor",    text = "&H000000&" },
+        { x = 0, y = 5, width = 1, height = 1, class = "label",   label = "Border Alpha: " },
+        { x = 1, y = 5, width = 1, height = 1, class = "textbox", name = "borderAlpha",    text = "&H00&" }
 
     }
 
     local pressed, res = aegisub.dialog.display(dialogConfig)
     if not pressed then aegisub.cancel() end
 
-    return CreateRoundedBorders(res.offset, res.radius, res.transformY, res.borderColor, res.borderAlpha)(sub, sel, activeLine)
+    return CreateRoundedBorders(res.offset, res.radius, res.transformY, res.borderColor, res.borderAlpha, res.heightscaling)(sub, sel, activeLine)
 end
 
 aegisub.register_macro(script_name, script_description, Gui)
+
