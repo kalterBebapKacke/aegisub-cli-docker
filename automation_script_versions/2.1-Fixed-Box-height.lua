@@ -24,33 +24,9 @@ function CreateRoundedBorders(bboxOffset, roundingRadius, transformY, borderColo
     return function(sub, sel, activeLine)
         local ass = Ass(sub, sel, activeLine, true)
 
-        local ass_copy = Table.copy(ass)
-        local results = {}
-
-        -- Get reference height
-        for line, s, i, n in ass_copy:iterSel() do
-            line.text = "Hh"
-            Line.extend(ass_copy, line)
-
-            local newHeight, centerY
-
-            -- Convert reference text to shape to get measurements
-            Line.callBackExpand(ass, line, nil, function(line)
-                local refBbox = Path(line.shape):boundingBox()
-
-                newHeight = refBbox.b - refBbox.t
-                centerY = (refBbox.t + refBbox.b) / 2
-            end)
-
-            table.insert(results, {newHeight, centerY})
-
-        end
-
-
         for line, s, i, n in ass:iterSel() do
             ass:progressLine(s, i, n)
             Line.extend(ass, line)
-            local newHeight, centerY = results[i][1], results[i][2]
 
             -- duplicate text as top layer
             local topLayer = Table.copy(line)
@@ -67,6 +43,13 @@ function CreateRoundedBorders(bboxOffset, roundingRadius, transformY, borderColo
                 ------------------------------------------------------------------
                 -- 1. SHAPERY: Bounding box of ASS-drawn text
                 ------------------------------------------------------------------
+                --local bbox = Path(bottom.shape):boundingBox()["assDraw"]
+
+                -- get max size of the Box Yutils.shape.text(line, styles[line.style])
+                -- local textShape = aegisub.text_to_shape("Hg", ass.styles[line.style], false, false)
+                local w, h, asc, desc = aegisub.text_extents(ass.styles[line.style], "HgyÁ")
+                local centerY = (desc - asc) / 2 - 2*asc
+                local newHeight = scaling_factor*(asc + desc)
 
                 -- normalize vertical bounds
                 local bboxData = Path(bottom.shape):boundingBox()
@@ -175,4 +158,3 @@ function Gui(sub, sel, activeLine)
 end
 
 aegisub.register_macro(script_name, script_description, Gui)
-
