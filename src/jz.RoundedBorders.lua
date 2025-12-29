@@ -38,7 +38,7 @@ function CreateRoundedBorders(bboxOffset, roundingRadius, transformY, borderColo
             Line.callBackExpand(ass, line, nil, function(line)
                 local refBbox = Path(line.shape):boundingBox()
 
-                newHeight = refBbox.b - refBbox.t
+                newHeight = (refBbox.b - refBbox.t)*scaling_factor
                 centerY = (refBbox.t + refBbox.b) / 2
             end)
 
